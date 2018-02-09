@@ -1,1 +1,1 @@
-include ':ads-core'
+include ':ads-core', ':app'
