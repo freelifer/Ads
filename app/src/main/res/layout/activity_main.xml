@@ -12,17 +12,20 @@
         android:layout_height="50dp"/>
 
     <EditText
+        android:id="@+id/ed_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/rl_calculator_body"
         android:background="@null"
+        android:cursorVisible="false"
+        android:inputType="numberDecimal"
         android:textSize="20sp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:textColor="@android:color/white"
         android:textColorHint="@android:color/white"
         android:textAlignment="textEnd"
-        android:hint="@string/app_name"
+        android:text="@string/cal_default_number"
         />
 
     <RelativeLayout

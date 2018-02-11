@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">App</string>
+    <string name="cal_default_number">0</string>
 </resources>

@@ -34,5 +34,45 @@
   {
     "type": -9,
     "location": [4, 2]
+  },
+  {
+    "type": 0,
+    "location": [4, 0]
+  },
+  {
+    "type": 1,
+    "location": [3, 0]
+  },
+  {
+    "type": 2,
+    "location": [3, 1]
+  },
+  {
+    "type": 3,
+    "location": [3, 2]
+  },
+  {
+    "type": 4,
+    "location": [2, 0]
+  },
+  {
+    "type": 5,
+    "location": [2, 1]
+  },
+  {
+    "type": 6,
+    "location": [2, 2]
+  },
+  {
+    "type": 7,
+    "location": [1, 0]
+  },
+  {
+    "type": 8,
+    "location": [1, 1]
+  },
+  {
+    "type": 9,
+    "location": [1, 2]
   }
 ]

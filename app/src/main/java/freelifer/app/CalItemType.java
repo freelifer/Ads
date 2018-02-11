@@ -13,6 +13,17 @@ public class CalItemType {
     public static final int TYPE_EXCEPT = (-7);
     public static final int TYPE_COMPUTE = (-8);
     public static final int TYPE_DOT = (-9);
+    public static final int TYPE_NUMBER = (0);
+    public static final int TYPE_ZERO = (0);
+    public static final int TYPE_ONE = (1);
+    public static final int TYPE_TWO = (2);
+    public static final int TYPE_THREE = (3);
+    public static final int TYPE_FOUR = (4);
+    public static final int TYPE_FIVE = (5);
+    public static final int TYPE_SIX = (6);
+    public static final int TYPE_SEVEN = (7);
+    public static final int TYPE_EIGHT = (8);
+    public static final int TYPE_NINE = (9);
 
     public int type;
 
