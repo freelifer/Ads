@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -22,12 +23,14 @@ public class Calculator implements View.OnClickListener {
     private int screenWidth;
     private int screenHeight;
     private int space;
-    private StringBuilder currentNumBuilder;
-    private StringBuilder lastNumBuilder;
+    private StringBuilder currentNumBuilder = new StringBuilder();
     private EditText edNumber;
+    private IButton iButtons = new DefaultButton();
 
     // 计算的中间结果。
     private double resultNum = 0.0;
+
+    private boolean isFirst = true;
 
 
     private Calculator(Point screenPoint) {
@@ -63,26 +66,27 @@ public class Calculator implements View.OnClickListener {
             }
             int locationLen = calData.location.length;
             RelativeLayout view = new RelativeLayout(context);
+            view.setGravity(Gravity.CENTER);
             lp = new RelativeLayout.LayoutParams(space, space);
             int row = calData.location[0];
             int column = calData.location[1];
             lp.topMargin = space * row;
             lp.leftMargin = space * column;
             view.setLayoutParams(lp);
-            if (row % 2 == 0) {
-                if (column % 2 == 0) {
-                    view.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
-                } else {
-                    view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-                }
-            } else {
-                if (column % 2 == 0) {
-                    view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-                } else {
-                    view.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
-                }
-            }
-            View v = CalculatorItems.getViewByType(context, space, space, calData.type);
+//            if (row % 2 == 0) {
+//                if (column % 2 == 0) {
+//                    view.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+//                } else {
+//                    view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+//                }
+//            } else {
+//                if (column % 2 == 0) {
+//                    view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+//                } else {
+//                    view.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+//                }
+//            }
+            View v = CalculatorItems.getViewByType(context, space, space, calData.type, iButtons);
             v.setOnClickListener(this);
             view.addView(v);
             calculatorBody.addView(view);
@@ -168,22 +172,23 @@ public class Calculator implements View.OnClickListener {
                 Toast.makeText(ctx, "TYPE_PERCENTAGE", Toast.LENGTH_SHORT).show();
                 break;
             case CalItemType.TYPE_PLUS:
-                plus();
+                handleOperator(type);
                 Toast.makeText(ctx, "TYPE_PLUS", Toast.LENGTH_SHORT).show();
                 break;
             case CalItemType.TYPE_MINUS:
+                handleOperator(type);
                 Toast.makeText(ctx, "TYPE_MINUS", Toast.LENGTH_SHORT).show();
                 break;
             case CalItemType.TYPE_MULTIPLY:
+                handleOperator(type);
                 Toast.makeText(ctx, "TYPE_MULTIPLY", Toast.LENGTH_SHORT).show();
                 break;
             case CalItemType.TYPE_EXCEPT:
                 Toast.makeText(ctx, "TYPE_EXCEPT", Toast.LENGTH_SHORT).show();
                 break;
             case CalItemType.TYPE_COMPUTE:
-                computeNum();
-                double num = Double.valueOf(currentNumBuilder.toString());
-                Toast.makeText(ctx, "TYPE_COMPUTE " + num, Toast.LENGTH_SHORT).show();
+                handleOperator(type);
+                Toast.makeText(ctx, "TYPE_COMPUTE", Toast.LENGTH_SHORT).show();
                 break;
             case CalItemType.TYPE_DOT:
                 fillNumber(".");
@@ -195,22 +200,49 @@ public class Calculator implements View.OnClickListener {
     }
 
     private void fillNumber(String number) {
-        if (currentNumBuilder == null) {
-            currentNumBuilder = new StringBuilder();
-        }
         if (currentNumBuilder.length() == 0 && "0".equals(number)) {
             return;
+        }
+
+        if (".".equals(number)) {
+            if (currentNumBuilder.length() == 0) {
+                currentNumBuilder.append("0");
+            } else {
+                if (checkDot(currentNumBuilder.toString())) {
+                    return;
+                }
+            }
         }
         currentNumBuilder.append(number);
         edNumber.setText(currentNumBuilder.toString());
     }
 
-    private void plus() {
-        // save last num
-        lastNumBuilder = new StringBuilder(currentNumBuilder.toString());
-        if (currentNumBuilder != null) {
+    private void handleOperator(int type) {
+        if (isFirst) {
+            isFirst = false;
+            resultNum = getNum(currentNumBuilder);
             currentNumBuilder.setLength(0);
+            return;
         }
+        if (type == CalItemType.TYPE_PLUS) {
+            resultNum += getNum(currentNumBuilder);
+        } else if (type == CalItemType.TYPE_MINUS) {
+            resultNum -= getNum(currentNumBuilder);
+        } else if (type == CalItemType.TYPE_COMPUTE) {
+            resultNum = getNum(currentNumBuilder);
+        } else if (type == CalItemType.TYPE_MULTIPLY) {
+            resultNum *= getNum(currentNumBuilder);
+        }
+        long t1;
+        double t2;
+        t1 = (long) resultNum;
+        t2 = resultNum - t1;
+        if (t2 == 0) {
+            edNumber.setText(String.valueOf(t1));
+        } else {
+            edNumber.setText(String.valueOf(resultNum));
+        }
+        currentNumBuilder.setLength(0);
     }
 
     private void acNumber() {
@@ -218,6 +250,8 @@ public class Calculator implements View.OnClickListener {
             currentNumBuilder.setLength(0);
             edNumber.setText(R.string.cal_default_number);
         }
+        resultNum = 0.0;
+        isFirst = true;
     }
 
     private void revNumber() {
@@ -244,25 +278,21 @@ public class Calculator implements View.OnClickListener {
 
     private double getNum(StringBuilder str) {
         if (str == null || str.length() <= 0) {
-            return 0;
+            return 0.0;
         }
         String numStr = str.toString();
         if (TextUtils.isEmpty(numStr)) {
-            return 0;
+            return 0.0;
         }
         try {
             return Double.valueOf(numStr);
         } catch (NumberFormatException e) {
             // ignore
         }
-        return 0;
+        return 0.0;
     }
 
     private void computeNum() {
-        double lastNum = getNum(lastNumBuilder);
-        double currentNum = getNum(currentNumBuilder);
-        double result = lastNum + currentNum;
-        edNumber.setText(result +"");
     }
 
     private String readFile(final Context context) {
@@ -302,50 +332,50 @@ public class Calculator implements View.OnClickListener {
      *
      * @param key
      */
-    private void handleOperator(String key) {
+//    private void handleOperator(String key) {
 //        if (operator.equals("/")) {
-            // 除法运算
-            // 如果当前结果文本框中的值等于0
+    // 除法运算
+    // 如果当前结果文本框中的值等于0
 //            if (getNumberFromText() == 0.0) {
-                // 操作不合法
+    // 操作不合法
 //                operateValidFlag = false;
 //                resultText.setText("除数不能为零");
 //            } else {
 //                resultNum /= getNumberFromText();
 //            }
 //        } else if (operator.equals("1/x")) {
-            // 倒数运算
+    // 倒数运算
 //            if (resultNum == 0.0) {
-                // 操作不合法
+    // 操作不合法
 //                operateValidFlag = false;
 //                resultText.setText("零没有倒数");
 //            } else {
 //                resultNum = 1 / resultNum;
 //            }
 //        } else if (operator.equals("+")) {
-            // 加法运算
+    // 加法运算
 //            resultNum += getNumberFromText();
 //        } else if (operator.equals("-")) {
 //             减法运算
 //            resultNum -= getNumberFromText();
 //        } else if (operator.equals("*")) {
-            // 乘法运算
+    // 乘法运算
 //            resultNum *= getNumberFromText();
 //        } else if (operator.equals("sqrt")) {
-            // 平方根运算
+    // 平方根运算
 //            resultNum = Math.sqrt(resultNum);
 //        } else if (operator.equals("%")) {
-            // 百分号运算，除以100
+    // 百分号运算，除以100
 //            resultNum = resultNum / 100;
 //        } else if (operator.equals("+/-")) {
-            // 正数负数运算
+    // 正数负数运算
 //            resultNum = resultNum * (-1);
 //        } else if (operator.equals("=")) {
-            // 赋值运算
+    // 赋值运算
 //            resultNum = getNumberFromText();
 //        }
 //        if (operateValidFlag) {
-            // 双精度浮点数的运算
+    // 双精度浮点数的运算
 //            long t1;
 //            double t2;
 //            t1 = (long) resultNum;
@@ -356,10 +386,10 @@ public class Calculator implements View.OnClickListener {
 //                resultText.setText(String.valueOf(resultNum));
 //            }
 //        }
-        // 运算符等于用户按的按钮
+    // 运算符等于用户按的按钮
 //        operator = key;
 //        firstDigit = true;
 //        operateValidFlag = true;
-    }
+//    }
 
 }

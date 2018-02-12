@@ -2,21 +2,15 @@ package freelifer.app;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 /**
  * @author kzhu on 2018/2/9.
  */
 public class CalculatorItems {
 
-    public static View getViewByType(Context context, int width, int height, int type) {
-        TextView textView = new TextView(context);
+    public static View getViewByType(Context context, int width, int height, int type, IButton iButtons) {
+        View textView = iButtons.button(context, type, width, height);
         textView.setTag(type);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(width, height);
-        textView.setText(type + "");
-        textView.setTextColor(context.getResources().getColor(android.R.color.white));
-        textView.setLayoutParams(lp);
         return textView;
     }
 

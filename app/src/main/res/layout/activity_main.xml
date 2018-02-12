@@ -18,7 +18,6 @@
         android:layout_above="@+id/rl_calculator_body"
         android:background="@null"
         android:cursorVisible="false"
-        android:inputType="numberDecimal"
         android:textSize="20sp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"

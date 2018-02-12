@@ -2,6 +2,8 @@ package freelifer.app;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         rlCalculatorBody = find(R.id.rl_calculator_body);
         edNumber = find(R.id.ed_number);
+        edNumber.setInputType(InputType.TYPE_NULL);
+        edNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
     }
 
     @SuppressWarnings("unchecked")
