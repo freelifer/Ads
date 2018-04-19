@@ -45,6 +45,7 @@ public class Calculator implements View.OnClickListener {
         return new Calculator(screenPoint);
     }
 
+
     public void fillCalculatorBody(final Context context, ViewGroup calculatorBody, EditText edNumber) {
         this.edNumber = edNumber;
         String json = readFile(context);
